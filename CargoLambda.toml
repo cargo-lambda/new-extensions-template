@@ -1,0 +1,7 @@
+[template]
+render_all_files = true
+
+[template.ignore_conditional_files]
+"src/events_extension.rs" = { var = "events", match = false }
+"src/logs_extension.rs" = { var = "logs", match = false }
+"src/telemetry_extension.rs" = { var = "telemetry", match = false }

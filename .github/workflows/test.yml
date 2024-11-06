@@ -1,0 +1,77 @@
+name: Test template
+
+on:
+  pull_request:
+    paths:
+      - ".github/actions/**"
+      - ".github/workflows/**"
+      - "template/**"
+      - "CargoLambda.toml"
+  push:
+    branches:
+      - main
+    paths:
+      - ".github/actions/**"
+      - ".github/workflows/**"
+      - "template/**"
+      - "CargoLambda.toml"
+  workflow_dispatch:
+
+jobs:
+  test-events-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/rust-setup
+
+      - name: Test events extension
+        run: |
+          mkdir -p tests && cd tests && \
+          cargo lambda new --extension -y --template .. events_extension && \
+          cd events_extension && \
+          cargo test && \
+          cargo lambda build --release --extension
+
+  test-logs-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/rust-setup
+
+      - name: Test logs extension without events
+        run: |
+          mkdir -p tests && cd tests && \
+          cargo lambda new --extension --logs --template .. logs_extension && \
+          cd logs_extension && \
+          cargo test && \
+          cargo lambda build --release --extension
+
+      - name: Test logs extension with events
+        run: |
+          mkdir -p tests && cd tests && \
+          cargo lambda new --extension --logs --events --template .. logs_extension_events && \
+          cd logs_extension_events && \
+          cargo test && \
+          cargo lambda build --release --extension
+
+  test-telemetry-extension:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: ./.github/actions/rust-setup
+
+      - name: Test telemetry extension without events
+        run: |
+          mkdir -p tests && cd tests && \
+          cargo lambda new --extension --telemetry --template .. telemetry_extension && \
+          cd telemetry_extension && \
+          cargo test && \
+          cargo lambda build --release --extension
+
+      - name: Test telemetry extension with events
+        run: |
+          mkdir -p tests && cd tests && \
+          cargo lambda new --extension --telemetry --events --template .. telemetry_extension_events && \
+          cd telemetry_extension_events && \
+          cargo test && \
+          cargo lambda build --release --extension
